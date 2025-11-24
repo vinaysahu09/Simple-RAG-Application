@@ -12,6 +12,17 @@ A powerful Retrieval-Augmented Generation (RAG) application that allows users to
 -   **Source Attribution**: Displays the specific PDF source and page number for every answer.
 -   **Confidence Score**: Shows the relevance score of the retrieved documents.
 -   **File Explorer**: Sidebar listing all available PDF documents.
+-   **File Upload**: Upload new PDF documents directly via the UI for instant indexing.
+
+## 📸 User Interface
+
+### Home Screen
+The clean, dark-themed interface provides easy access to your document library and chat.
+![Home Screen](screenshots/home.png)
+
+### Chat Interface
+Ask questions about your documents and get accurate, sourced answers.
+![Chat Interface](screenshots/ask_ai.png)
 
 ## 🛠️ Tech Stack
 
@@ -89,6 +100,8 @@ Before asking questions, you need to process your PDF files.
     ```
     *This script will read the PDFs, generate embeddings, and store them in `data/vector_storage/`.*
 
+    > **Note**: You can also skip this step and upload files directly through the web interface after starting the application.
+
 #### 2. Start the Web Application
 
 Once data is ingested, start the server:
@@ -106,5 +119,7 @@ http://localhost:8000
 ```
 
 -   **Left Sidebar**: View the list of indexed PDF files.
+-   **File Upload**: Click "Choose File" and then the upload button to add new documents.
+-   **Search Box**: Type your question and hit "Ask AI".
 -   **Search Box**: Type your question and hit "Ask AI".
 -   **Results**: View the AI-generated answer, confidence score, and source references.

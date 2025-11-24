@@ -357,13 +357,204 @@
             width: 8px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem 1.25rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        outline: none;
+        transition: all 0.2s ease;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 4px;
+        input[type="text"]:focus {
+            border-color: var(--accent-color);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        button {
+            background: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            padding: 0 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-area {
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result-area.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .answer-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+        }
+
+        .label {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .answer-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+        }
+
+        /* Markdown Styles */
+        .answer-text strong {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .answer-text ul,
+        .answer-text ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .answer-text li {
+            margin-bottom: 0.5rem;
+        }
+
+        .answer-text p {
+            margin-bottom: 1rem;
+        }
+
+        .answer-text p:last-child {
+            margin-bottom: 0;
+        }
+
+        .meta-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .meta-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .confidence-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success-color);
+        }
+
+        .sources-list {
+            list-style: none;
+        }
+
+        .source-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .source-item:last-child {
+            border-bottom: none;
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #0f172a;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -390,6 +581,33 @@
             <ul id="fileList" class="file-list">
                 <!-- Files will be loaded here -->
             </ul>
+
+            <!-- Upload Section -->
+            <div class="upload-section"
+                style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <div style="margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary);">Upload PDF</div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="file" id="fileInput" accept=".pdf" style="display: none;"
+                        onchange="handleFileSelect(this)">
+                    <button onclick="document.getElementById('fileInput').click()"
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem; flex: 1;">
+                        Choose File
+                    </button>
+                    <button id="uploadBtn" onclick="uploadFile()" disabled
+                        style="padding: 0.5rem; width: 40px; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="selectedFileName"
+                    style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                </div>
+                <div id="uploadStatus" style="font-size: 0.8rem; margin-top: 0.5rem;"></div>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -459,6 +677,63 @@
                 if (fileList) {
                     fileList.innerHTML = '<li class="file-item" style="color: #ef4444;">Error loading files</li>';
                 }
+            }
+        }
+
+        function handleFileSelect(input) {
+            const fileName = input.files[0]?.name;
+            const uploadBtn = document.getElementById('uploadBtn');
+            const nameDisplay = document.getElementById('selectedFileName');
+
+            if (fileName) {
+                nameDisplay.textContent = fileName;
+                uploadBtn.disabled = false;
+            } else {
+                nameDisplay.textContent = '';
+                uploadBtn.disabled = true;
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const statusDiv = document.getElementById('uploadStatus');
+
+            uploadBtn.disabled = true;
+            statusDiv.textContent = 'Uploading and processing...';
+            statusDiv.style.color = 'var(--accent-color)';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.textContent = 'Success!';
+                    statusDiv.style.color = 'var(--success-color)';
+                    fileInput.value = '';
+                    document.getElementById('selectedFileName').textContent = '';
+                    fetchFiles(); // Refresh list
+                    setTimeout(() => {
+                        statusDiv.textContent = '';
+                    }, 3000);
+                } else {
+                    throw new Error(result.detail || 'Upload failed');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                statusDiv.textContent = 'Error: ' + error.message;
+                statusDiv.style.color = '#ef4444';
+                uploadBtn.disabled = false;
             }
         }
 

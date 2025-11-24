@@ -3,6 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from src.vector_store_chromadb import VectorStoreManager
 import os
+# Import for file upload
+from fastapi import File, UploadFile
+import shutil
+from langchain_community.document_loaders import PyMuPDFLoader
 
 app = FastAPI()
 
@@ -45,6 +49,51 @@ async def list_files():
     
     files = [f for f in os.listdir(pdf_dir) if f.lower().endswith('.pdf')]
     return {"files": files}
+
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    try:
+        # Ensure data directory exists
+        pdf_dir = os.path.join("data", "pdf_files")
+        if not os.path.exists(pdf_dir):
+            os.makedirs(pdf_dir)
+            
+        # Save the file
+        file_path = os.path.join(pdf_dir, file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        # Process the file if vector store is available
+        if vector_store_manager:
+            # Load the document
+            loader = PyMuPDFLoader(file_path)
+            documents = loader.load()
+            
+            # Add metadata
+            for doc in documents:
+                doc.metadata['source'] = file.filename
+                doc.metadata['file_type'] = 'pdf'
+                
+            # Chunk and embed
+            chunks = vector_store_manager.embedding_manager.chunk_documents(documents)
+            embeddings = vector_store_manager.embedding_manager.generate_embeddings_with_chunks(chunks)
+            
+            # Add to vector store
+            vector_store_manager.add_documents_to_collection(chunks, embeddings)
+            
+            return {
+                "message": f"File '{file.filename}' uploaded and processed successfully",
+                "chunks_count": len(chunks)
+            }
+        else:
+            return {
+                "message": f"File '{file.filename}' uploaded but vector store not initialized",
+                "warning": "Vector store not available"
+            }
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing file: {str(e)}")
 
 app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
