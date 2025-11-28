@@ -480,7 +480,7 @@
 
         async function fetchFiles() {
             try {
-                const response = await fetch('/files');
+                const response = await fetch('./files');
                 const data = await response.json();
                 const fileList = document.getElementById('fileList');
 
@@ -534,7 +534,7 @@
             formData.append('file', file);
 
             try {
-                const response = await fetch('/upload', {
+                const response = await fetch('./upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -579,7 +579,7 @@
             resultArea.classList.remove('visible');
 
             try {
-                const response = await fetch('/ask', {
+                const response = await fetch('./ask', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
